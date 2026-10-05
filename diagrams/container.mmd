@@ -1,0 +1,25 @@
+C4Container
+    title Container Diagram - SALESTORM Flash Sale Architecture
+
+    Person(user, "User", "Flash Sale Buyer")
+    
+    Container(spa, "Single Page App", "React 18, Vite, TS, Tailwind", "Command Center & Buyer UI")
+    Container(api_gateway, "API Gateway", "FastAPI / Rate Limiter", "Token bucket rate limiting, ingress admission control")
+    Container(inventory_svc, "Inventory Service", "Python FastAPI", "Atomic stock updates, consistency boundary")
+    Container(reservation_svc, "Reservation Service", "Python FastAPI", "30s hold TTLs, idempotency key validation")
+    Container(payment_svc, "Payment Service", "Python FastAPI", "Circuit Breaker protected payment processing")
+    Container(order_svc, "Order Service", "Python FastAPI", "Asynchronous outbox event consumer")
+    
+    ContainerDb(db, "SQL Database", "PostgreSQL / SQLite", "Transactional inventory, orders, payments, outbox events")
+    Container(broker, "Message Broker", "Kafka / In-Memory Queue", "Asynchronous PaymentSucceeded events")
+    
+    Rel(user, spa, "Interacts with", "HTTPS")
+    Rel(spa, api_gateway, "API Requests", "REST / JSON")
+    Rel(api_gateway, inventory_svc, "Routes stock checks", "gRPC / HTTP")
+    Rel(api_gateway, reservation_svc, "Routes purchase attempts", "gRPC / HTTP")
+    Rel(reservation_svc, inventory_svc, "Atomic update", "SQL Tx")
+    Rel(reservation_svc, db, "Persists hold", "SQL Tx")
+    Rel(payment_svc, db, "Updates payment ledger", "SQL Tx")
+    Rel(payment_svc, broker, "Publishes PaymentSucceeded", "Async Event")
+    Rel(broker, order_svc, "Consumes events", "Async Queue")
+    Rel(order_svc, db, "Persists confirmed order", "SQL Tx")

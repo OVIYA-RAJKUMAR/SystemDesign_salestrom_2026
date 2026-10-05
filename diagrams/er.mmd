@@ -1,0 +1,68 @@
+erDiagram
+    CUSTOMER ||--o{ INVENTORY_RESERVATION : makes
+    PRODUCT ||--|| INVENTORY : has
+    PRODUCT ||--o{ INVENTORY_RESERVATION : reserves
+    INVENTORY_RESERVATION ||--o| PAYMENT : pays
+    PAYMENT ||--o| ORDER : settles
+    ORDER ||--o{ ORDER_ITEM : contains
+    ORDER ||--o| SHIPMENT : generates
+
+    CUSTOMER {
+        string customer_id PK
+        string email
+        string name
+    }
+
+    PRODUCT {
+        string product_id PK
+        string sku
+        float price
+        int stock_initial
+    }
+
+    INVENTORY {
+        string inventory_id PK
+        string product_id FK
+        int available_quantity
+        int reserved_quantity
+        int sold_quantity
+        int version
+    }
+
+    INVENTORY_RESERVATION {
+        string reservation_id PK
+        string customer_id FK
+        string product_id FK
+        int quantity
+        string status
+        string idempotency_key UK
+        datetime expires_at
+    }
+
+    PAYMENT {
+        string payment_id PK
+        string reservation_id FK
+        string order_id FK
+        float amount
+        string status
+        string transaction_reference UK
+        string idempotency_key UK
+    }
+
+    ORDER {
+        string order_id PK
+        string customer_id FK
+        string reservation_id FK
+        string payment_id FK
+        string status
+        float total_amount
+    }
+
+    OUTBOX_EVENT {
+        string event_id PK
+        string event_type
+        string aggregate_id
+        string payload
+        string status
+        int retry_count
+    }

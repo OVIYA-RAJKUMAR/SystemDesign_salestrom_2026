@@ -1,0 +1,33 @@
+sequenceDiagram
+    autonumber
+    actor Customer
+    participant Gateway as API Gateway
+    participant PaySvc as Payment Service
+    participant CB as Circuit Breaker
+    participant ExtPay as External Payment Gateway
+    participant DB as SQL Database
+    participant Broker as Message Broker
+
+    Customer->>Gateway: POST /api/v1/payments (reservation_id, Idempotency-Key)
+    Gateway->>PaySvc: process_payment(...)
+    PaySvc->>CB: Check Circuit Breaker State
+    alt Circuit Breaker OPEN
+        CB-->>PaySvc: Reject Request Fast
+        PaySvc-->>Gateway: 503 Service Unavailable (CIRCUIT_BREAKER_OPEN)
+        Gateway-->>Customer: 503 Service Unavailable
+    else Circuit Breaker CLOSED
+        PaySvc->>ExtPay: Charge Card / UPI
+        alt Payment Succeeded
+            ExtPay-->>PaySvc: 200 OK (Transaction Reference)
+            PaySvc->>DB: Update Payment SUCCESS, Confirm Stock Sale
+            PaySvc->>DB: INSERT OutboxEvent PaymentSucceeded
+            PaySvc->>Broker: Publish PaymentSucceeded
+            PaySvc-->>Gateway: 201 Created (Payment SUCCESS)
+            Gateway-->>Customer: 201 Payment Success
+        else Payment Failed / Timed out
+            ExtPay-->>PaySvc: Failure / Timeout
+            PaySvc->>DB: Release Reservation Stock Back to Available
+            PaySvc-->>Gateway: 502 Bad Gateway / 504 Timeout
+            Gateway-->>Customer: Payment Failed (Stock Released)
+        end
+    end

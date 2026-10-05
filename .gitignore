@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Build & Dist
+dist/
+frontend/dist/
+.vite/
+frontend/.vite/
+
+# Python & Caching
+__pycache__/
+*.pyc
+.pytest_cache/
+*.db
+*.sqlite
+*.sqlite3
+salestorm.db
+
+# Environment & Secrets
+.env
+.env.local
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini

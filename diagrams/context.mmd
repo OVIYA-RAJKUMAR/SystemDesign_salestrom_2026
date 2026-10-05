@@ -1,0 +1,9 @@
+C4Context
+    title System Context Diagram - SALESTORM Flash Sale System
+
+    Person(customer, "Customer / Buyer", "Participates in high-concurrency flash sale")
+    System(salestorm, "SALESTORM Platform", "High-scale, concurrency-safe flash-sale e-commerce platform guaranteeing zero overselling")
+    System_Ext(payment_gateway, "External Payment Gateway", "Processes credit card & UPI payments (Stripe/Razorpay)")
+
+    Rel(customer, salestorm, "Submits purchase requests, views telemetry", "HTTPS/WSS")
+    Rel(salestorm, payment_gateway, "Processes payment transactions", "HTTPS REST API")

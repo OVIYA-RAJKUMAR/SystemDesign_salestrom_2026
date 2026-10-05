@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Custom glowing effects & animations for Enterprise Command Center */
+.glow-emerald {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+}
+
+.glow-rose {
+  box-shadow: 0 0 20px rgba(244, 63, 94, 0.2);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+}
+
+@keyframes pulse-fast {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-fast {
+  animation: pulse-fast 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes flow-line {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.animate-flow {
+  stroke-dasharray: 6 6;
+  animation: flow-line 0.8s linear infinite;
+}

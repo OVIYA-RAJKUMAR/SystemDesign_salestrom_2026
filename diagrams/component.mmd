@@ -1,0 +1,47 @@
+graph TD
+    subgraph API Layer
+        Router[FastAPI APIRouter]
+        Middleware[Rate Limiting & Idempotency Middleware]
+    end
+
+    subgraph Service Layer
+        ResSvc[Reservation Service]
+        PaySvc[Payment Service]
+        OrdSvc[Order Service]
+        SimSvc[Simulation Service]
+    end
+
+    subgraph Domain Layer
+        CB[Circuit Breaker]
+        MB[InMemory Message Broker]
+        FS[Failure Simulator]
+    end
+
+    subgraph Repository Layer
+        InvRepo[Inventory Repository]
+        ResRepo[Reservation Repository]
+        PayRepo[Payment Repository]
+        OrdRepo[Order Repository]
+        OutRepo[Outbox Repository]
+    end
+
+    subgraph Database
+        SQL[(Relational SQL DB)]
+    end
+
+    Router --> Middleware
+    Middleware --> ResSvc
+    Middleware --> PaySvc
+    ResSvc --> InvRepo
+    ResSvc --> ResRepo
+    ResSvc --> OutRepo
+    PaySvc --> CB
+    PaySvc --> PayRepo
+    PaySvc --> MB
+    MB --> OrdSvc
+    OrdSvc --> OrdRepo
+    InvRepo --> SQL
+    ResRepo --> SQL
+    PayRepo --> SQL
+    OrdRepo --> SQL
+    OutRepo --> SQL
